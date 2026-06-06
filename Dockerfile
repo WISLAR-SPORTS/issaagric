@@ -2,7 +2,7 @@
 FROM php:8.3-fpm
 
 # ----------------------------
-# Step 1: Install system dependencies + PHP extensions
+# Step 1: System dependencies + PHP extensions
 # ----------------------------
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev libxml2-dev \
@@ -17,38 +17,34 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # ----------------------------
-# Step 3: Set working directory
+# Step 3: Working directory
 # ----------------------------
 WORKDIR /var/www
 
 # ----------------------------
-# Step 4: Copy application files
+# Step 4: Copy project files
 # ----------------------------
 COPY . .
 
 # ----------------------------
-# Step 5: OPTIONAL: create SQLite DB (skip if using Postgres/MySQL)
+# Step 5: Install dependencies (NO DB access during build)
 # ----------------------------
-# RUN mkdir -p /var/www/database && touch /var/www/database/database.sqlite
-
-# ----------------------------
-# Step 6: Install PHP dependencies safely
-# ----------------------------
-# Prevent Laravel from failing during build due to DB access
 RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Run Laravel safely after install
 RUN php artisan package:discover || true
 
 # ----------------------------
-# Step 7: Fix permissions
+# Step 6: Permissions
 # ----------------------------
 RUN chmod -R 775 storage bootstrap/cache
 
 # ----------------------------
-# Step 8: Expose port
+# Step 7: Expose port
 # ----------------------------
 EXPOSE 8080
 
 # ----------------------------
-# Step 9: Run Laravel development server
+# Step 8: Start Laravel
 # ----------------------------
 CMD php artisan serve --host=0.0.0.0 --port=8080
