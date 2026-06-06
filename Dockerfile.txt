@@ -1,31 +1,28 @@
 # =========================
-# 1. Vendor stage (Composer only)
+# 1. Vendor stage
 # =========================
 FROM composer:2 AS vendor
 
 WORKDIR /app
 
-# Copy only dependency files first (better caching)
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies (ignore platform issues handled in runtime stage)
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction \
-    --ignore-platform-reqs
+    --ignore-platform-reqs \
+    --no-scripts
 
-# Now copy full app (needed for autoload optimization, packages, etc.)
 COPY . .
 
 # =========================
-# 2. Runtime stage (FrankenPHP + extensions)
+# 2. Runtime stage
 # =========================
 FROM dunglas/frankenphp:php8.3-bookworm AS app
 
 WORKDIR /app
 
-# Install required PHP extensions for Laravel + Filament
 RUN install-php-extensions \
     intl \
     zip \
@@ -36,18 +33,13 @@ RUN install-php-extensions \
     pcntl \
     bcmath
 
-# Copy application code
 COPY . .
 
-# Copy vendor from composer stage
 COPY --from=vendor /app/vendor /app/vendor
 
-# Ensure permissions (important for Laravel)
 RUN mkdir -p storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Expose default port (FrankenPHP uses 80 internally)
 EXPOSE 80
 
-# Start FrankenPHP (recommended entrypoint)
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
