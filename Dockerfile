@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev libxml2-dev \
     libzip-dev libicu-dev \
     && docker-php-ext-install \
-    pdo pdo_mysql mbstring exif pcntl bcmath gd intl zip \
+       pdo pdo_mysql mbstring exif pcntl bcmath gd intl zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------
@@ -27,7 +27,12 @@ WORKDIR /var/www
 COPY . .
 
 # ----------------------------
-# Step 5: Install dependencies (NO DB access during build)
+# Step 5: Ensure required Laravel directories exist
+# ----------------------------
+RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
+
+# ----------------------------
+# Step 6: Install dependencies
 # ----------------------------
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
@@ -35,16 +40,17 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 RUN php artisan package:discover || true
 
 # ----------------------------
-# Step 6: Permissions
+# Step 7: Permissions
 # ----------------------------
-RUN chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
 # ----------------------------
-# Step 7: Expose port
+# Step 8: Expose port
 # ----------------------------
 EXPOSE 8080
 
 # ----------------------------
-# Step 8: Start Laravel
+# Step 9: Start Laravel
 # ----------------------------
 CMD php artisan serve --host=0.0.0.0 --port=8080
