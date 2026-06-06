@@ -1,28 +1,31 @@
 # =========================
-# 1. Vendor stage (Composer + PHP extensions)
+# 1. Vendor stage (Composer only)
 # =========================
 FROM composer:2 AS vendor
 
-# Install PHP extensions required by dependencies
-RUN apt-get update && apt-get install -y \
-    libicu-dev \
-    libzip-dev \
-    libpng-dev \
-    unzip \
-    git \
-    && docker-php-ext-install intl zip gd
+WORKDIR /app
+
+# Copy only dependency files first (better caching)
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies (ignore platform issues handled in runtime stage)
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --ignore-platform-reqs
+
+# Now copy full app (needed for autoload optimization, packages, etc.)
+COPY . .
+
+# =========================
+# 2. Runtime stage (FrankenPHP + extensions)
+# =========================
+FROM dunglas/frankenphp:php8.3-bookworm AS app
 
 WORKDIR /app
 
-COPY composer.json composer.lock ./
-
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# =========================
-# 2. Runtime stage
-# =========================
-FROM dunglas/frankenphp:php8.3-bookworm
-
+# Install required PHP extensions for Laravel + Filament
 RUN install-php-extensions \
     intl \
     zip \
@@ -33,9 +36,18 @@ RUN install-php-extensions \
     pcntl \
     bcmath
 
-WORKDIR /app
-
+# Copy application code
 COPY . .
+
+# Copy vendor from composer stage
 COPY --from=vendor /app/vendor /app/vendor
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Ensure permissions (important for Laravel)
+RUN mkdir -p storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+# Expose default port (FrankenPHP uses 80 internally)
+EXPOSE 80
+
+# Start FrankenPHP (recommended entrypoint)
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
