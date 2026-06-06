@@ -1,10 +1,10 @@
 {
   "php": {
-    "version": "8.3"
-  },
-  "extensions": [
-    "intl",
-    "zip",
-    "gd"
-  ]
+    "version": "8.3",
+    "extensions": [
+      "intl",
+      "zip",
+      "gd"
+    ]
+  }
 }
