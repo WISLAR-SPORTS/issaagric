@@ -1,3 +1,11 @@
+# Stage 1: Composer dependencies
+FROM composer:2 AS vendor
+
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader
+
+# Stage 2: App runtime
 FROM dunglas/frankenphp:php8.3-bookworm
 
 RUN install-php-extensions \
@@ -13,7 +21,6 @@ RUN install-php-extensions \
 WORKDIR /app
 
 COPY . .
-
-RUN composer install --no-dev --optimize-autoloader
+COPY --from=vendor /app/vendor /app/vendor
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
