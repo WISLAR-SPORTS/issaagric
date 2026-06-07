@@ -21,9 +21,6 @@ php artisan route:clear
 php artisan view:clear
 php artisan route:list
 echo "Starting server..."
+echo "Starting Laravel server..."
 
-
-echo "Laravel is ready ✅"
-
-# Keep container alive using PHP-FPM
-php-fpm
+exec php -S 0.0.0.0:$PORT -t public
