@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Support\Facades\View;

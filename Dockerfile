@@ -37,7 +37,7 @@ RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Run Laravel safely after install
-RUN php artisan package:discover || true
+
 
 # ----------------------------
 # Step 7: Permissions
