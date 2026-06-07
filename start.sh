@@ -21,4 +21,3 @@ php artisan route:clear
 php artisan view:clear
 php artisan route:list
 echo "Starting server..."
-exec php -S 0.0.0.0:8080 -t public index.php
