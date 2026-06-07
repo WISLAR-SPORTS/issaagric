@@ -11,6 +11,9 @@ use App\Http\Controllers\UserExportController;
 use App\Http\Controllers\LandingPageController;
 //use App\Http\Controllers\YourController;
 use App\Http\Controllers\FaqQuestionController;
+Route::get('/', function () {
+    return 'Laravel is working';
+});
 
 Route::get('/ask-question', [FaqQuestionController::class, 'create'])->name('ask');
 Route::post('/ask-question', [FaqQuestionController::class, 'store']);
