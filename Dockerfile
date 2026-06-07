@@ -58,4 +58,4 @@ RUN chmod +x start.sh
 # ----------------------------
 # Step 10: Start app via script
 # ----------------------------
-CMD ["sh", "start.sh"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
