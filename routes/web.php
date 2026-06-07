@@ -12,7 +12,7 @@ use App\Http\Controllers\LandingPageController;
 //use App\Http\Controllers\YourController;
 use App\Http\Controllers\FaqQuestionController;
 Route::get('/', function () {
-    return 'Laravel is working';
+    return env('APP_KEY'); // just to test env loading
 });
 
 Route::get('/ask-question', [FaqQuestionController::class, 'create'])->name('ask');
