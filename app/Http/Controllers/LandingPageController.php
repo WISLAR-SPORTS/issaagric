@@ -16,9 +16,7 @@ class LandingPageController extends Controller
     {
         return view('landing', [
             'hero' => HeroSection::first(),
-            'features' => Feature::where('is_active', true)
-                                ->orderBy('sort_order')
-                                ->get(),
+            'features' => Feature::all(),
 
             'stats' => Stat::orderBy('sort_order')->get(),
 
