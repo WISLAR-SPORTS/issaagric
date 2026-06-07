@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+echo "Fixing storage permissions..."
+mkdir -p storage/logs
+chmod -R 775 storage
+
 echo "Running migrations..."
 php artisan migrate --force
 
