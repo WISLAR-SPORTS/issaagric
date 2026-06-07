@@ -6,7 +6,10 @@
             <!-- Logo -->
             <div class="logo">
                 <a href="{{ route('landing') }}">
-                    <img src="{{ asset('storage/' . $settings->logo) }}" alt="AgriWeb Logo">
+                    <img 
+    src="{{ $settings && $settings->logo ? asset('storage/' . $settings->logo) : asset('images/default-logo.png') }}" 
+    alt="AgriWeb Logo"
+>
                     <span>UNUSU AgriWeb</span>
                 </a>
             </div>
