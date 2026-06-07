@@ -1,25 +1,20 @@
 <?php
 
 namespace App\Providers;
+
 use App\Models\Setting;
 use Illuminate\Support\Facades\View;
-
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Filament\Facades\Filament;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Filament::serving(function () {
@@ -28,8 +23,9 @@ class AppServiceProvider extends ServiceProvider
                 fn () => redirect('/')
             );
         });
-        View::share('settings', Setting::first());
-        //
+
+        if (Schema::hasTable('settings')) {
+            View::share('settings', Setting::first());
+        }
     }
-    
 }
