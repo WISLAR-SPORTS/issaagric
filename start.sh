@@ -1,5 +1,7 @@
 #!/bin/sh
 set -e
+echo "APP_KEY is:"
+printenv APP_KEY
 
 echo "Fixing storage permissions..."
 mkdir -p storage/logs
